@@ -4,7 +4,7 @@ import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } 
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 // ==========================================
-// Firebase設定 (ご自身のプロジェクト情報に書き換えてください)
+// Firebase設定
 // ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyCJ4cC0F-xxJnCUa4BLCGemxrWEZdZsX_4",
@@ -15,7 +15,6 @@ const firebaseConfig = {
   appId: "1:571592267447:web:ab31e5632b28a6feee5f32",
   measurementId: "G-LHZEEBSEJK"
 };
-
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -129,9 +128,9 @@ function renderPdfList(pdfs) {
         <small>地名: ${pdf.location} | 企業: ${pdf.company} ${pdf.name ? '| 個人: ' + pdf.name : ''}</small>
       </div>
       <div class="pdf-actions">
-        <button class="preview-btn">表示</button>
-        <button class="edit-btn">編集</button>
-        <button class="delete-btn">削除</button>
+        <button type="button" class="preview-btn">表示</button>
+        <button type="button" class="edit-btn">編集</button>
+        <button type="button" class="delete-btn">削除</button>
       </div>
     `;
 
@@ -238,7 +237,7 @@ function setupEventListeners() {
     const keyword = document.getElementById('search-input').value.toLowerCase();
     if (!keyword) return;
 
-    const filtered = allPdfs.filter(p => 
+    const filtered = allPdfs.path ? [] : allPdfs.filter(p => 
       p.location.toLowerCase().includes(keyword) ||
       p.company.toLowerCase().includes(keyword) ||
       (p.name && p.name.toLowerCase().includes(keyword)) ||
