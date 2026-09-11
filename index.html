@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDFカレンダービューア</title>
+  </head>
+  <body>
+    <div id="app">
+      <header>
+        <button id="prev-month">＜ 前月</button>
+        <h2 id="month-title">年月</h2>
+        <button id="next-month">翌月 ＞</button>
+      </header>
+
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="地名、企業名、個人名、タイトルで検索..." />
+        <button id="search-btn">検索</button>
+        <button id="reset-btn" style="display:none;">解除</button>
+      </div>
+
+      <div id="calendar-grid"></div>
+    </div>
+
+    <!-- 日付詳細・プレビューモーダル -->
+    <div id="modal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span id="close-modal" class="close">&times;</span>
+        <h3 id="modal-date-title">日付</h3>
+        
+        <div id="pdf-list-section">
+          <h4>登録されているPDF一覧</h4>
+          <div id="pdf-items"></div>
+        </div>
+
+        <hr />
+
+        <h4>新規PDF登録・編集</h4>
+        <form id="pdf-form">
+          <input type="hidden" id="edit-id" />
+          <div class="form-group">
+            <label>地名:</label>
+            <input type="text" id="input-location" required />
+          </div>
+          <div class="form-group">
+            <label>企業名:</label>
+            <input type="text" id="input-company" required />
+          </div>
+          <div class="form-group">
+            <label>個人名 (空欄可):</label>
+            <input type="text" id="input-name" />
+          </div>
+          <div class="form-group">
+            <label>PDFタイトル:</label>
+            <input type="text" id="input-title" required />
+          </div>
+          <div class="form-group">
+            <label>PDFファイル:</label>
+            <input type="file" id="input-file" accept="application/pdf" />
+          </div>
+          <button type="submit" id="save-btn">登録する</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- PDF直接プレビューモーダル -->
+    <div id="preview-modal" class="modal" style="display:none;">
+      <div class="modal-content preview-content">
+        <span id="close-preview" class="close">&times;</span>
+        <iframe id="pdf-iframe" style="width:100%; height:80vh;" frameborder="0"></iframe>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
