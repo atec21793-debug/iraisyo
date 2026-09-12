@@ -124,8 +124,8 @@ function renderPdfList(pdfs) {
     item.className = 'pdf-item-card';
     item.innerHTML = `
       <div class="pdf-item-info">
-        <strong>${pdf.title}</strong><br>
-        <small>地名: ${pdf.location} | 企業: ${pdf.company} ${pdf.name ? '| 個人: ' + pdf.name : ''}</small>
+        <strong>地名: ${pdf.location} | 企業: ${pdf.company}</strong><br>
+        <small>${pdf.name ? '個人: ' + pdf.name : ''}</small>
       </div>
       <div class="pdf-actions">
         <button type="button" class="preview-btn">表示</button>
@@ -144,7 +144,6 @@ function renderPdfList(pdfs) {
       document.getElementById('input-location').value = pdf.location;
       document.getElementById('input-company').value = pdf.company;
       document.getElementById('input-name').value = pdf.name || '';
-      document.getElementById('input-title').value = pdf.title;
       document.getElementById('save-btn').textContent = '更新する';
     });
 
@@ -171,7 +170,6 @@ pdfForm.addEventListener('submit', async (e) => {
   const location = document.getElementById('input-location').value;
   const company = document.getElementById('input-company').value;
   const name = document.getElementById('input-name').value;
-  const title = document.getElementById('input-title').value;
   const fileInput = document.getElementById('input-file');
 
   let fileUrl = '';
@@ -187,7 +185,7 @@ pdfForm.addEventListener('submit', async (e) => {
 
   if (editId) {
     // 編集
-    const updateData = { location, company, name, title };
+    const updateData = { location, company, name };
     if (fileUrl) {
       updateData.fileUrl = fileUrl;
       updateData.filePath = filePath;
@@ -204,7 +202,6 @@ pdfForm.addEventListener('submit', async (e) => {
       location,
       company,
       name,
-      title,
       fileUrl,
       filePath,
       createdAt: new Date()
@@ -234,24 +231,53 @@ function setupEventListeners() {
 
   // 検索処理
   document.getElementById('search-btn').addEventListener('click', () => {
-    const keyword = document.getElementById('search-input').value.toLowerCase();
+    const keyword = document.getElementById('search-input').value.toLowerCase().trim();
     if (!keyword) return;
 
-    const filtered = allPdfs.path ? [] : allPdfs.filter(p => 
-      p.location.toLowerCase().includes(keyword) ||
-      p.company.toLowerCase().includes(keyword) ||
-      (p.name && p.name.toLowerCase().includes(keyword)) ||
-      p.title.toLowerCase().includes(keyword)
+    const filtered = allPdfs.filter(p => 
+      (p.location && p.location.toLowerCase().includes(keyword)) ||
+      (p.company && p.company.toLowerCase().includes(keyword)) ||
+      (p.name && p.name.toLowerCase().includes(keyword))
     );
 
     calendarGrid.innerHTML = '';
     monthTitle.textContent = `検索結果: "${keyword}" (${filtered.length}件)`;
-    document.getElementById('reset-btn').style.display = 'inline-block';
+
+    if (filtered.length === 0) {
+      calendarGrid.innerHTML = '<p style="grid-column: span 7; text-align: center; padding: 20px;">一致するデータが見つかりませんでした。</p>';
+    } else {
+      const matchedDates = [...new Set(filtered.map(p => p.date))];
+      matchedDates.forEach(dateStr => {
+        const div = document.createElement('div');
+        div.className = 'calendar-day';
+        div.style.minHeight = '80px';
+        
+        const dayNum = document.createElement('div');
+        dayNum.className = 'day-number';
+        dayNum.textContent = dateStr;
+        div.appendChild(dayNum);
+
+        const matchedPdfs = filtered.filter(p => p.date === dateStr);
+        const indicator = document.createElement('div');
+        indicator.className = 'indicator';
+        indicator.textContent = `${matchedPdfs.length}件`;
+        div.appendChild(indicator);
+
+        div.addEventListener('click', () => openModal(dateStr, matchedPdfs));
+        calendarGrid.appendChild(div);
+      });
+    }
+
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) resetBtn.style.display = 'inline-block';
   });
 
-  document.getElementById('reset-btn').addEventListener('click', () => {
-    document.getElementById('search-input').value = '';
-    document.getElementById('reset-btn').style.display = 'none';
-    renderCalendar();
-  });
+  const resetBtn = document.getElementById('reset-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      document.getElementById('search-input').value = '';
+      resetBtn.style.display = 'none';
+      renderCalendar();
+    });
+  }
 }
